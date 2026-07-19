@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Головоломка 54T</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e17;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            width: 100%;
+            background: linear-gradient(135deg, #1a2332 0%, #0d1421 100%);
+            border-bottom: 1px solid #2a3a5c;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, #00d4ff, #7b2ffc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: #8899bb;
+            font-size: 1rem;
+        }
+
+        main {
+            display: flex;
+            gap: 30px;
+            padding: 30px;
+            max-width: 1400px;
+            width: 100%;
+            flex: 1;
+        }
+
+        #game-container {
+            flex: 2;
+            min-height: 600px;
+            background: #141c2b;
+            border-radius: 16px;
+            border: 1px solid #2a3a5c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #game-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 16px;
+        }
+
+        #info-panel {
+            flex: 1;
+            min-width: 250px;
+            background: #141c2b;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #2a3a5c;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        #info-panel h3 {
+            color: #00d4ff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #1a2332;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2ffc);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .controls button {
+            padding: 12px 16px;
+            background: #1a2332;
+            border: 1px solid #2a3a5c;
+            color: #c0d0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .controls button:hover {
+            background: #2a3a5c;
+            border-color: #00d4ff;
+            color: white;
+        }
+
+        #reset-btn {
+            background: #2a1a2a;
+            border-color: #5c2a3a;
+            color: #ff88aa;
+        }
+
+        .tips p {
+            color: #667799;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            padding: 20px;
+            color: #445566;
+            font-size: 0.8rem;
+            text-align: center;
+            border-top: 1px solid #1a2332;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            main {
+                flex-direction: column;
+                padding: 15px;
+            }
+            #game-container {
+                min-height: 400px;
+            }
+            #info-panel {
+                min-width: auto;
+            }
+        }
+
+        /* ===== СТИЛИ ДЛЯ ЗАГРУЗКИ ===== */
+        #unity-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader {
+            width: 40px;
+            height: 40px;
+            margin: 15px auto;
+            border: 3px solid #2a3a5c;
+            border-top: 3px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧩 Головоломка "54Т"</h1>
+        <p>Заполните куб 6×6×6 с помощью 54 Т-образных деталей</p>
+    </header>
+
+    <main>
+        <div id="game-container">
+            <div id="unity-container">
+                <div id="unity-loading" style="color:#667799;text-align:center;">
+                    <p>⏳ Загрузка игры...</p>
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+        
+        <aside id="info-panel">
+            <div>
+                <h3>📊 Прогресс</h3>
+                <p>Установлено деталей: <span id="counter">0</span> / 54</p>
+                <div class="progress-bar">
+                    <div id="progress-fill"></div>
+                </div>
+            </div>
+            <div class="controls">
+                <h3>🎮 Управление</h3>
+                <button onclick="rotatePiece('X')">↻ Вращать X</button>
+                <button onclick="rotatePiece('Y')">↻ Вращать Y</button>
+                <button onclick="rotatePiece('Z')">↻ Вращать Z</button>
+                <button id="reset-btn" onclick="resetGame()">🔄 Сброс</button>
+            </div>
+            <div class="tips">
+                <h3>💡 Подсказка</h3>
+                <p>Кликните по детали, затем по свободному месту в кубе</p>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <p>Информационно-цифровая практика, 2026</p>
+    </footer>
+
+    <script>
+        // ===== СВЯЗЬ С UNITY =====
+        let unityInstance = null;
+
+        function updateProgress(count) {
+            document.getElementById('counter').textContent = count;
+            document.getElementById('progress-fill').style.width = (count / 54) * 100 + '%';
+        }
+
+        function showVictory() {
+            alert('🎉 Поздравляем! Куб собран!');
+        }
+
+        function rotatePiece(axis) {
+            if (unityInstance) {
+                unityInstance.SendMessage('WebBridge', 'RotatePiece', axis);
+            } else {
+                console.warn('Unity еще не загружен');
+            }
+        }
+
+        function resetGame() {
+            if (unityInstance && confirm('Сбросить прогресс?')) {
+                unityInstance.SendMessage('WebBridge', 'ResetGame');
+            }
+        }
+
+        // ===== ЗАГРУЗКА UNITY =====
+        window.onload = function() {
+            console.log('Страница загружена. Ожидайте Unity...');
+            
+            // ===== ВСТАВЬТЕ СЮДА КОД ИНИЦИАЛИЗАЦИИ ИЗ ФАЙЛА UNITY =====
+            // Вместо этой заглушки вставьте код из файла index (2).html
+            // Он начинается с "var unityInstance = null;" и заканчивается на "createUnityInstance(...)"
+            
+            // ВРЕМЕННАЯ ЗАГЛУШКА (пока нет кода Unity)
+            setTimeout(() => {
+                document.getElementById('unity-loading').style.display = 'none';
+                const container = document.getElementById('unity-container');
+                const msg = document.createElement('div');
+                msg.style.cssText = 'text-align:center;color:#667799;font-size:1.2rem;';
+                msg.innerHTML = '🎮 <span style="color:#00d4ff;">Unity загружен</span><br><small>(здесь будет игра)</small>';
+                container.appendChild(msg);
+            }, 2000);
+        };
+    </script>
+
+</body>
+</html>
