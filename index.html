@@ -151,30 +151,6 @@
                 min-width: auto;
             }
         }
-
-        /* ===== СТИЛИ ДЛЯ ЗАГРУЗКИ ===== */
-        #unity-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .loader {
-            width: 40px;
-            height: 40px;
-            margin: 15px auto;
-            border: 3px solid #2a3a5c;
-            border-top: 3px solid #00d4ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -186,10 +162,10 @@
 
     <main>
         <div id="game-container">
-            <div id="unity-container">
+            <div id="unity-container" style="width:100%;height:100%;">
                 <div id="unity-loading" style="color:#667799;text-align:center;">
                     <p>⏳ Загрузка игры...</p>
-                    <div class="loader"></div>
+                    <div style="width:40px;height:40px;margin:15px auto;border:3px solid #2a3a5c;border-top:3px solid #00d4ff;border-radius:50%;animation:spin 1s linear infinite;"></div>
                 </div>
             </div>
         </div>
@@ -220,6 +196,13 @@
         <p>Информационно-цифровая практика, 2026</p>
     </footer>
 
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
     <script>
         // ===== СВЯЗЬ С UNITY =====
         let unityInstance = null;
@@ -247,129 +230,40 @@
             }
         }
 
-        // ===== ЗАГРУЗКА UNITY =====
-        window.onload = function() {
-            console.log('Страница загружена. Ожидайте Unity...');
-            
-            <script>
-      var canvas = document.querySelector("#unity-canvas");
+        // ===== КОД ИНИЦИАЛИЗАЦИИ UNITY =====
+        var canvas = document.querySelector("#unity-container");
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/WebBuild.loader.js";
 
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
-      function unityShowBanner(msg, type) {
-        var warningBanner = document.querySelector("#unity-warning");
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
-        updateBannerVisibility();
-      }
-
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/WebBuild.loader.js";
-      var config = {
-        arguments: [],
-        dataUrl: buildUrl + "/WebBuild.data.gz",
-        frameworkUrl: buildUrl + "/WebBuild.framework.js.gz",
-        codeUrl: buildUrl + "/WebBuild.wasm.gz",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "My project (1)",
-        productVersion: "0.1",
-        showBanner: unityShowBanner,
-        // errorHandler: function(err, url, line) {
-        //    alert("error " + err + " occurred at line " + line);
-        //    // Return 'true' if you handled this error and don't want Unity
-        //    // to process it further, 'false' otherwise.
-        //    return true;
-        // },
-      };
-
-      // By default, Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
-
-      // If you would like all file writes inside Unity Application.persistentDataPath
-      // directory to automatically persist so that the contents are remembered when
-      // the user revisits the site the next time, uncomment the following line:
-      // config.autoSyncPersistentDataPath = true;
-      // This autosyncing is currently not the default behavior to avoid regressing
-      // existing user projects that might rely on the earlier manual
-      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
-      // expected to change.
-
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        document.querySelector("#unity-container").className = "unity-mobile";
-        canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
-      }
-
-      document.querySelector("#unity-loading-bar").style.display = "block";
-
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                document.querySelector("#unity-loading-bar").style.display = "none";
-                document.querySelector("#unity-fullscreen-button").onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-
-              }).catch((message) => {
-                alert(message);
-              });
-            };
-
-      document.body.appendChild(script);
-
-    </script>
-            // Вместо этой заглушки вставьте код из файла index (2).html
-            // Он начинается с "var unityInstance = null;" и заканчивается на "createUnityInstance(...)"
-            
-            // ВРЕМЕННАЯ ЗАГЛУШКА (пока нет кода Unity)
-            setTimeout(() => {
-                document.getElementById('unity-loading').style.display = 'none';
-                const container = document.getElementById('unity-container');
-                const msg = document.createElement('div');
-                msg.style.cssText = 'text-align:center;color:#667799;font-size:1.2rem;';
-                msg.innerHTML = '🎮 <span style="color:#00d4ff;">Unity загружен</span><br><small>(здесь будет игра)</small>';
-                container.appendChild(msg);
-            }, 2000);
+        var config = {
+            arguments: [],
+            dataUrl: buildUrl + "/WebBuild.data.gz",
+            frameworkUrl: buildUrl + "/WebBuild.framework.js.gz",
+            codeUrl: buildUrl + "/WebBuild.wasm.gz",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "DefaultCompany",
+            productName: "My project (1)",
+            productVersion: "0.1",
+            showBanner: function(msg, type) {
+                console.log(msg);
+            }
         };
+
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+                console.log("Загрузка: " + (progress * 100) + "%");
+            }).then((instance) => {
+                unityInstance = instance;
+                document.getElementById('unity-loading').style.display = 'none';
+                console.log("Unity загружен!");
+            }).catch((message) => {
+                alert("Ошибка загрузки Unity: " + message);
+            });
+        };
+
+        document.body.appendChild(script);
     </script>
 
 </body>
