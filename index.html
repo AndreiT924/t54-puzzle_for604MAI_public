@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Головоломка 54T</title>
     <style>
-        /* ===== ВАШ ДИЗАЙН (без изменений) ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== ДИЗАЙН ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0e17;
@@ -16,6 +21,7 @@
             flex-direction: column;
             align-items: center;
         }
+
         header {
             text-align: center;
             padding: 20px 0;
@@ -23,13 +29,19 @@
             background: linear-gradient(135deg, #1a2332 0%, #0d1421 100%);
             border-bottom: 1px solid #2a3a5c;
         }
+
         header h1 {
             font-size: 2.2rem;
             background: linear-gradient(90deg, #00d4ff, #7b2ffc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        header p { color: #8899bb; font-size: 1rem; }
+
+        header p {
+            color: #8899bb;
+            font-size: 1rem;
+        }
+
         main {
             display: flex;
             gap: 30px;
@@ -38,6 +50,7 @@
             width: 100%;
             flex: 1;
         }
+
         #game-container {
             flex: 2;
             min-height: 600px;
@@ -47,13 +60,14 @@
             position: relative;
             overflow: hidden;
         }
-        /* Стиль для холста Unity, чтобы он вписывался в контейнер */
+
         #game-container canvas {
             width: 100% !important;
             height: 100% !important;
             display: block;
             border-radius: 16px;
         }
+
         #info-panel {
             flex: 1;
             min-width: 250px;
@@ -65,12 +79,14 @@
             flex-direction: column;
             gap: 25px;
         }
+
         #info-panel h3 {
             color: #00d4ff;
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -78,12 +94,14 @@
             border-radius: 4px;
             overflow: hidden;
         }
+
         #progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #00d4ff, #7b2ffc);
             transition: width 0.3s ease;
             width: 0%;
         }
+
         .controls button {
             padding: 12px 16px;
             background: #1a2332;
@@ -96,17 +114,24 @@
             width: 100%;
             margin-bottom: 5px;
         }
+
         .controls button:hover {
             background: #2a3a5c;
             border-color: #00d4ff;
             color: white;
         }
+
         #reset-btn {
             background: #2a1a2a;
             border-color: #5c2a3a;
             color: #ff88aa;
         }
-        .tips p { color: #667799; font-size: 0.9rem; }
+
+        .tips p {
+            color: #667799;
+            font-size: 0.9rem;
+        }
+
         footer {
             padding: 20px;
             color: #445566;
@@ -115,13 +140,20 @@
             border-top: 1px solid #1a2332;
             width: 100%;
         }
+
         @media (max-width: 900px) {
-            main { flex-direction: column; padding: 15px; }
-            #game-container { min-height: 400px; }
-            #info-panel { min-width: auto; }
+            main {
+                flex-direction: column;
+                padding: 15px;
+            }
+            #game-container {
+                min-height: 400px;
+            }
+            #info-panel {
+                min-width: auto;
+            }
         }
 
-        /* Анимация загрузки */
         .loader {
             width: 40px;
             height: 40px;
@@ -131,10 +163,12 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
         #unity-loading {
             position: absolute;
             top: 50%;
@@ -154,7 +188,6 @@
 
     <main>
         <div id="game-container">
-            <!-- Сюда Unity вставит свой холст -->
             <div id="unity-loading">
                 <p>⏳ Загрузка игры...</p>
                 <div class="loader"></div>
@@ -214,32 +247,27 @@
             }
         }
 
-        // ===== ЗАПУСК UNITY =====
+        // ===== ЗАПУСК UNITY (БЕЗ СЖАТИЯ) =====
         window.onload = function() {
             console.log('Запуск Unity...');
 
-            // Находим наш контейнер, куда будем вставлять игру
             var container = document.getElementById('game-container');
-
-            // Создаём холст (canvas) для Unity
             var canvas = document.createElement('canvas');
             canvas.id = 'unity-canvas';
             canvas.width = 960;
             canvas.height = 600;
-            container.appendChild(canvas); // Вставляем в контейнер
+            container.appendChild(canvas);
 
-            // Убираем надпись "Загрузка..." когда игра будет готова
             var loadingDiv = document.getElementById('unity-loading');
-            
-            // Путь к файлам сборки
+
             var buildUrl = "Build";
             var loaderUrl = buildUrl + "/WebBuild.loader.js";
 
             var config = {
                 arguments: [],
-                dataUrl: buildUrl + "/WebBuild.data.gz",
-                frameworkUrl: buildUrl + "/WebBuild.framework.js.gz",
-                codeUrl: buildUrl + "/WebBuild.wasm.gz",
+                dataUrl: buildUrl + "/WebBuild.data",
+                frameworkUrl: buildUrl + "/WebBuild.framework.js",
+                codeUrl: buildUrl + "/WebBuild.wasm",
                 streamingAssetsUrl: "StreamingAssets",
                 companyName: "DefaultCompany",
                 productName: "My project (1)",
@@ -249,7 +277,6 @@
                 }
             };
 
-            // Подгружаем и запускаем Unity
             var script = document.createElement("script");
             script.src = loaderUrl;
             script.onload = () => {
@@ -257,7 +284,7 @@
                     console.log("Загрузка: " + (progress * 100).toFixed(0) + "%");
                 }).then((instance) => {
                     unityInstance = instance;
-                    loadingDiv.style.display = 'none'; // Скрываем загрузку
+                    loadingDiv.style.display = 'none';
                     console.log("✅ Unity загружен и работает!");
                 }).catch((message) => {
                     alert("Ошибка загрузки Unity: " + message);
